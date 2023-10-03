@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat con Socket.io</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <style>
+      .chat-2-message {
+        text-align: right;
+        background-color: #dcf8c6;
+        margin-left: 50%;
+        transform: translateX(-50%);
+        padding: 10px;
+        border-radius: 10px;
+        clear: both;
+      }
+
+      .chat-1-message {
+        text-align: left;
+        background-color: #dcf8c6;
+        margin-left: 50%;
+        transform: translateX(-50%);
+        padding: 10px;
+        border-radius: 10px;
+        clear: both;
+      }
+    </style>
+    <script>
+      var socket = io();
+
+      function enviarMensaje1() {
+        var mensaje = document.getElementById('mensaje1').value;
+        var nombreUsuario = document.getElementById('nombre1').value;
+        var fotoUsuario = document.getElementById('foto1').files[0];
+
+        // Mostrar el nombre del usuario 1 en el chat
+        document.getElementById('nombreUsuario1').textContent = nombreUsuario;
+
+        // Mostrar la foto de perfil del usuario 1 en el chat
+        if (fotoUsuario) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            var fotoElement = document.getElementById('fotoUsuario1');
+            fotoElement.src = e.target.result;
+          };
+          reader.readAsDataURL(fotoUsuario);
+        }
+
+        socket.emit('chat message 1', { mensaje, nombreUsuario, fotoUsuario });
+        document.getElementById('mensaje1').value = '';
+        return false;
+      }
+
+      socket.on('chat message 1', function (msgData) {
+        var listarMensajes = document.getElementById('lista-mensajes');
+        var mensaje = document.createElement('li');
+        mensaje.textContent = msgData.nombreUsuario + ': ' + msgData.mensaje;
+        mensaje.className = 'chat-1-message';
+        listarMensajes.appendChild(mensaje);
+      });
+
+      function enviarMensaje2() {
+        var mensaje = document.getElementById('mensaje2').value;
+        var nombreUsuario = document.getElementById('nombre2').value;
+        var fotoUsuario = document.getElementById('foto2').files[0];
+
+        // Mostrar el nombre del usuario 2 en el chat
+        document.getElementById('nombreUsuario2').textContent = nombreUsuario;
+
+        // Mostrar la foto de perfil del usuario 2 en el chat
+        if (fotoUsuario) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            var fotoElement = document.getElementById('fotoUsuario2');
+            fotoElement.src = e.target.result;
+          };
+          reader.readAsDataURL(fotoUsuario);
+        }
+
+        socket.emit('chat message 2', { mensaje, nombreUsuario, fotoUsuario });
+        document.getElementById('mensaje2').value = '';
+        return false;
+      }
+
+      socket.on('chat message 2', function (msgData) {
+        var listarMensajes = document.getElementById('lista-mensajes');
+        var mensaje = document.createElement('li');
+        mensaje.textContent = msgData.nombreUsuario + ': ' + msgData.mensaje;
+        mensaje.className = 'chat-2-message';
+        listarMensajes.appendChild(mensaje);
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h1 class="card-title">Chat 1</h1>
+              <!-- Agregar campo para el nombre -->
+              <input
+                id="nombre1"
+                class="form-control mb-2"
+                placeholder="Tu nombre"
+                autocomplete="off"
+                required
+              />
+              <!-- Agregar campo para la foto de perfil -->
+              <input
+                type="file"
+                id="foto1"
+                class="form-control mb-2"
+                accept="image/*"
+                required
+              />
+              <form onsubmit="return enviarMensaje1()">
+                <div class="input-group">
+                  <input
+                    id="mensaje1"
+                    class="form-control"
+                    autocomplete="off"
+                    required
+                  />
+                  <div class="input-group-append">
+                    <button class="btn btn-primary">Enviar</button>
+                  </div>
+                </div>
+              </form>
+              <!-- Mostrar nombre y foto de perfil del usuario -->
+              <h6 class="mt-3">Nombre: <span id="nombreUsuario1"></span></h6>
+              <img
+                id="fotoUsuario1"
+                src=""
+                alt="Foto de perfil"
+                class="img-fluid rounded-circle"
+                style="max-width: 100px; max-height: 100px"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h1 class="card-title">Chat 2</h1>
+              <!-- Agregar campo para el nombre -->
+              <input
+                id="nombre2"
+                class="form-control mb-2"
+                placeholder="Tu nombre"
+                autocomplete="off"
+                required
+              />
+              <!-- Agregar campo para la foto de perfil -->
+              <input
+                type="file"
+                id="foto2"
+                class="form-control mb-2"
+                accept="image/*"
+                required
+              />
+              <form onsubmit="return enviarMensaje2()">
+                <div class="input-group">
+                  <input
+                    id="mensaje2"
+                    class="form-control"
+                    autocomplete="off"
+                    required
+                  />
+                  <div class="input-group-append">
+                    <button class="btn btn-primary">Enviar</button>
+                  </div>
+                </div>
+              </form>
+              <!-- Mostrar nombre y foto de perfil del usuario -->
+              <h6 class="mt-3">Nombre: <span id="nombreUsuario2"></span></h6>
+              <img
+                id="fotoUsuario2"
+                src=""
+                alt="Foto de perfil"
+                class="img-fluid rounded-circle"
+                style="max-width: 100px; max-height: 100px"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container mt-4">
+      <h1>Mensaje</h1>
+      <ul id="lista-mensajes"></ul>
+    </div>
+  </body>
+</html>
